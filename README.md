@@ -1,1 +1,1 @@
-# uexMobSmsVerify
+# uexMobSMS

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<uexplugins>
+    <plugin
+        className="org.zywx.wbpalmstar.plugin.uexmobsms.EUEXMobSMS" uexName="uexMobSMS" >
+        <method name = "init" />
+        <method name = "sendCode" />
+        <method name = "commitCode"/>
+    </plugin>
+</uexplugins>

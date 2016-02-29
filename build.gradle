@@ -7,8 +7,6 @@ repositories{
 }
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
-    compile name:'SMSSDK-2.0.1',ext:'aar'
-
 }
 
 android {

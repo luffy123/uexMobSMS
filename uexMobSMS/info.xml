@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexMobSMS" version="3.0.0" build="0">
-        <info>0:uexMobSMS插件出新</info>
+        uexName="uexMobSMS" version="3.0.1" build="1">
+        <info>1:添加出错信息返回</info>
+        <build>0:uexMobSMS插件出新</build>
     </plugin>
 </uexplugins>

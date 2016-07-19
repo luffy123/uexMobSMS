@@ -20,10 +20,6 @@ public class EUEXMobSMS extends EUExBase {
     private static final String TAG = "EUEXMobSMS";
     public static final String CALLBACK_ON_SEND_CODE = "uexMobSMS.cbSendClick";
     public static final String CALLBACK_ON_COMMIT_CODE = "uexMobSMS.cbCommitClick";
-    public static final String MSG_COMMIT_CODE_SUCCESS = "验证成功";
-    public static final String MSG_COMMIT_CODE_FAIL = "验证失败";
-    public static final String MSG_GET_CODE_SUCCESS = "获取验证码成功";
-    public static final String MSG_GET_CODE_FAIL = "获取验证码失败";
 
     public EUEXMobSMS(Context context, EBrowserView view) {
         super(context, view);
@@ -76,23 +72,36 @@ public class EUEXMobSMS extends EUExBase {
                 if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                     try {
                         jsonObject.put("status", EUExCallback.F_C_SUCCESS);
-                        jsonObject.put("msg", MSG_COMMIT_CODE_SUCCESS);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    callBackPluginJs(CALLBACK_ON_COMMIT_CODE, jsonObject.toString());
+                    callBackJsObject(CALLBACK_ON_COMMIT_CODE, jsonObject.toString());
                 } else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE){
                     try {
                         jsonObject.put("status", EUExCallback.F_C_SUCCESS);
-                        jsonObject.put("msg", MSG_GET_CODE_SUCCESS);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    callBackPluginJs(CALLBACK_ON_SEND_CODE, jsonObject.toString());
+                    callBackJsObject(CALLBACK_ON_SEND_CODE, jsonObject.toString());
                 }
-
             } else {
-                errorCallback(0, 0, "操作出错，请重试");
+                //失败情况的处理
+                Throwable throwable = (Throwable) data;
+                String errorMsg = throwable.getMessage();
+                try {
+                    JSONObject obj = new JSONObject(errorMsg);
+                    int errorCode = obj.optInt("status");
+                    JSONObject resultObj = new JSONObject();
+                    resultObj.put("status", EUExCallback.F_C_FAILED);
+                    resultObj.put("errorCode", errorCode);
+                    if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
+                        callBackJsObject(CALLBACK_ON_COMMIT_CODE, resultObj);
+                    } else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE){
+                        callBackJsObject(CALLBACK_ON_SEND_CODE, resultObj);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
     };
@@ -105,7 +114,7 @@ public class EUEXMobSMS extends EUExBase {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        callBackPluginJs(fun, jsonObject.toString());
+        callBackJsObject(fun, jsonObject.toString());
     }
 
     public void sendCode(String[] params) {
@@ -117,13 +126,8 @@ public class EUEXMobSMS extends EUExBase {
         JSONObject jsonObject;
         try {
             jsonObject = new JSONObject(json);
-            if (TextUtils.isEmpty(jsonObject.optString("phoneNum")) ||
-                    TextUtils.isEmpty(jsonObject.optString("countryCode"))) {
-                errorCallback(CALLBACK_ON_SEND_CODE, "phoneNum or countryCode is null !");
-                return;
-            }
-            String phoneNum = jsonObject.getString("phoneNum");
-            String countryCode =  jsonObject.getString("countryCode");
+            String phoneNum = jsonObject.optString("phoneNum");
+            String countryCode =  jsonObject.optString("countryCode");
             SMSSDK.getVerificationCode(countryCode, phoneNum);
         } catch (JSONException e) {
             Log.i(TAG, e.getMessage());
@@ -154,12 +158,6 @@ public class EUEXMobSMS extends EUExBase {
             Log.i(TAG, e.getMessage());
             Toast.makeText(mContext, "JSON解析错误", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void callBackPluginJs(String methodName, String jsonData){
-        String js = SCRIPT_HEADER + "if(" + methodName + "){"
-                + methodName + "('" + jsonData + "');}";
-        onCallback(js);
     }
 
     @Override

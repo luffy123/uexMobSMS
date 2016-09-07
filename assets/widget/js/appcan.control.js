@@ -7,6 +7,16 @@
 
  */
 /*global appcan,window */
+appcan.use("detect", function($, detect) {
+    if (detect.os.ios) {
+        var viewport = document.getElementsByName("viewport");
+        var scale = window.devicePixelRatio ? (1 / window.devicePixelRatio) : 1;
+        $("[name='viewport']").attr("content", "width=device-width,target-densitydpi=device-dpi,initial-scale=" + scale + ", minimum-scale=" + scale + ", maximum-scale=" + scale);
+        var fontsize = $("body").css("font-size");
+        $("body").css("font-size", parseInt(fontsize) * window.devicePixelRatio + "px");
+    }
+})
+
 appcan.extend(function(app, exports, module) {
     var $ = appcan.require('dom');
     var appWin = appcan.require('window');
@@ -20,6 +30,7 @@ appcan.extend(function(app, exports, module) {
      *
      */
     function isWindows() {
+        if(window.navigator.platform == "Win32") return true;
         if (!('ontouchstart' in window))
             return true;
     }
@@ -62,12 +73,22 @@ appcan.extend(function(app, exports, module) {
     }
 
     function select(sel, cb) {
+        $("select",$(sel))[0].selectedIndex = -1;
+        var tl =$(sel).find("div[class=text]");
+        var sl =$(sel).find('select');
+        var op =sl.find('option');
+        var index =parseInt(sl.attr('selectedIndex'));
+        if(index != -1){
+            tl.html(sl[0].options[index].text);
+        }
+
         $("select", $(sel)).on("change", function(evt) {
             var ele = $(evt.currentTarget);
             appcan.selectChange(evt.currentTarget);
             cb && cb(ele, ele.val());
         });
     }
+
 
     function touch(className, fun) {
         var ele = window.event.currentTarget || window.event.srcElement;
@@ -516,7 +537,8 @@ appcan.extend(function(app, exports, module) {
             callback = tasks;
             tasks = [];
         }
-        callback = appcan.isFunction(callback) ? callback : function(){};
+        callback = appcan.isFunction(callback) ? callback : function() {
+        };
         var errData = 0;
         var resData = null;
         var taskIdx = 0;
@@ -556,8 +578,10 @@ appcan.extend(function(app, exports, module) {
 
     //for emulator
     $(document).ready(function() {
-        initFontsize();
+
     });
+
+    initFontsize();
 
     module.exports = {
         elementFor : elementFor,

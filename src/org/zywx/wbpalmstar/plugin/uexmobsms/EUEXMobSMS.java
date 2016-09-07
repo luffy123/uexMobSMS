@@ -21,6 +21,9 @@ public class EUEXMobSMS extends EUExBase {
     public static final String CALLBACK_ON_SEND_CODE = "uexMobSMS.cbSendClick";
     public static final String CALLBACK_ON_COMMIT_CODE = "uexMobSMS.cbCommitClick";
 
+    private int sendCodeCallBackId = -1;
+    private int commitCodeCallBackId = -1;
+
     public EUEXMobSMS(Context context, EBrowserView view) {
         super(context, view);
 
@@ -70,19 +73,27 @@ public class EUEXMobSMS extends EUExBase {
             if (result == SMSSDK.RESULT_COMPLETE) {
                 JSONObject jsonObject = new JSONObject();
                 if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
-                    try {
-                        jsonObject.put("status", EUExCallback.F_C_SUCCESS);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    if(commitCodeCallBackId != -1) {
+                        callbackToJs(commitCodeCallBackId, false, EUExCallback.F_C_SUCCESS);
+                    } else {
+                        try {
+                            jsonObject.put("status", EUExCallback.F_C_SUCCESS);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        callBackJsObject(CALLBACK_ON_COMMIT_CODE, jsonObject.toString());
                     }
-                    callBackJsObject(CALLBACK_ON_COMMIT_CODE, jsonObject.toString());
                 } else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE){
-                    try {
-                        jsonObject.put("status", EUExCallback.F_C_SUCCESS);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    if(sendCodeCallBackId != -1) {
+                        callbackToJs(sendCodeCallBackId, false, EUExCallback.F_C_SUCCESS);
+                    } else {
+                        try {
+                            jsonObject.put("status", EUExCallback.F_C_SUCCESS);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        callBackJsObject(CALLBACK_ON_SEND_CODE, jsonObject.toString());
                     }
-                    callBackJsObject(CALLBACK_ON_SEND_CODE, jsonObject.toString());
                 }
             } else {
                 //失败情况的处理
@@ -123,6 +134,13 @@ public class EUEXMobSMS extends EUExBase {
             return;
         }
         String json = params[0];
+        if (params.length == 2) {
+            try {
+                sendCodeCallBackId = Integer.parseInt(params[1]);
+            }catch (Exception e) {
+
+            }
+        }
         JSONObject jsonObject;
         try {
             jsonObject = new JSONObject(json);
@@ -141,6 +159,13 @@ public class EUEXMobSMS extends EUExBase {
             return;
         }
         String json = params[0];
+        if (params.length == 2) {
+            try {
+                commitCodeCallBackId = Integer.parseInt(params[1]);
+            }catch (Exception e) {
+
+            }
+        }
         JSONObject jsonObject;
         try {
             jsonObject = new JSONObject(json);

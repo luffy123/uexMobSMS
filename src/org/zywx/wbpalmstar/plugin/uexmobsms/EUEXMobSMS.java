@@ -106,9 +106,18 @@ public class EUEXMobSMS extends EUExBase {
                     resultObj.put("status", EUExCallback.F_C_FAILED);
                     resultObj.put("errorCode", errorCode);
                     if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
-                        callBackJsObject(CALLBACK_ON_COMMIT_CODE, resultObj);
+                        if (commitCodeCallBackId!=-1){
+                            callbackToJs(commitCodeCallBackId,false,errorCode);
+                        }else{
+                            callBackJsObject(CALLBACK_ON_COMMIT_CODE, resultObj);
+                        }
+
                     } else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE){
-                        callBackJsObject(CALLBACK_ON_SEND_CODE, resultObj);
+                        if (sendCodeCallBackId!=-1){
+                            callbackToJs(sendCodeCallBackId,false,errorCode);
+                        }else{
+                            callBackJsObject(CALLBACK_ON_SEND_CODE, resultObj);
+                        }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

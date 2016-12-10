@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexMobSMS" version="4.0.0" build="2">
-        <info>2:4.0插件</info>
+        uexName="uexMobSMS" version="4.0.1" build="3">
+        <info>3:删除敏感权限</info>
+        <build>2:4.0插件</build>
         <build>1:添加出错信息返回</build>
         <build>0:uexMobSMS插件出新</build>
     </plugin>

@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexMobSMS" version="4.0.1" build="1">
-        <info>1:删除敏感权限</info>
+        uexName="uexMobSMS" version="4.3.1" build="2">
+        <info>2:添加动态权限申请</info>
+        <build>1:删除敏感权限</build>
         <build>0:4.0插件</build>
     </plugin>
 </uexplugins>
